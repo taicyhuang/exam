@@ -1,0 +1,263 @@
+
+
+<?php
+header("Content-Type: text/html; charset=utf-8");
+
+// $xPath_p = '../';
+// $menu    = "signup";
+// $submenu = "031";
+
+// include $xPath_p . "_base/init.php";  //cx 整合 opensql 並相容舊有寫法 ,並啟用ADODB_FETCH_ASSOC
+// $ADODB_FETCH_MODE = ADODB_FETCH_ASSOC;
+// $conn->SetFetchMode(ADODB_FETCH_NUM); //相容舊有寫法
+// $_GET && SafeFilter($_GET);
+// $_POST && SafeFilter($_POST);
+$myhost     = $myhost;
+$myuser     = $myuser;
+$mypassword = $mypass;
+$mydatabase = $mydb;
+
+try{
+    $pdo=new PDO(
+      "mysql:host=".$myhost.";
+      dbname=".$mydatabase,$myuser,$mypassword,array(PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES utf8"));
+    // echo "sucess";
+}catch (PDOException $e){
+    exit("DB CAN'T CONNECT!");
+}
+
+
+$sql="select eid as '代碼',ename as '類別' from exam_type";
+$sth=$pdo->prepare($sql);
+$sth->execute();
+$rs=$sth->fetchAll();
+
+// $_sql="select c.Amount as '錄取名額' ,Aname as '分發單位', a.remark1 as '測驗科目',a.remark2  as '工作內容簡述'   from exam_subj as a
+// left  join exam_type as b on a.EID=b.EID
+// left join exam_subj_area as c  on a.ESID=c.ESID 
+// where c.type='A'";
+
+// $statement = $pdo->prepare($_sql);
+// $statement->execute();
+// $results=$statement->fetchAll(PDO::FETCH_ASSOC);
+
+
+
+
+
+
+
+?>
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+    <html xmlns="http://www.w3.org/1999/xhtml">
+
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <title>
+            <?=@$WebTitle;?>
+        </title>
+        <link href="../css/layout.css" rel="stylesheet" type="text/css">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+
+
+
+<script>
+    function check_subj()
+    {
+        var select_op=$('#ename').val();
+        // alert(select_op);
+        $.ajax({
+            url:'modify-form1w-ajax.php',
+            data:{
+                ename:select_op,
+                },
+            dataType:'text',
+            type:"POST",
+
+            success: function(message)
+            {
+                console.log(message);
+             document.getElementById("message").innerHTML=message;
+            },
+            error:   function(jqXHR, textStatus, errorThrown)
+            { 
+                // document.getElementById("message").innerHTML=errorThrown; 
+            }
+            
+        });
+
+       
+    }
+
+    function add_subj()
+    {
+        var select_op=$('#subj_name').val();
+        window.location = 'modify-form1w-subj-add.php?add='+select_op;
+    }
+
+</script>
+
+
+
+
+        </head>
+
+<body>
+<center>
+    <form method="POST" action="">
+        <table border="1">
+
+
+        請選擇要更改之類組
+        <select  id="ename" onchange="check_subj()"; >
+            <?php 
+            foreach($rs as $k1=>$v1)
+            {
+                foreach($v1 as $k2=>$v2)
+                {
+                   
+                    
+                   $v2_sth=$v2;
+                }
+                //TODO 這邊要修改value值
+                echo "<option value=".$v2_sth.">".$v2_sth."</option>";
+            }
+            ?>
+
+        </select>
+            請選擇要新增的類組 <select  id="subj_name" onchange="add_subj()"; >
+            <?php 
+            foreach($rs as $k1=>$v1)
+            {
+                foreach($v1 as $k2=>$v2)
+                {
+                   
+                    
+                   $v2_sth=$v2;
+                }
+                //TODO 這邊要修改value值
+                echo "<option value=".$v2_sth.">".$v2_sth."</option>";
+            }
+            ?>
+
+        </select>
+        </table>
+        </form>
+        <div id="message"></div>
+        </center>
+    </body>
+</html>
+<script>
+
+    
+    function edit(id)
+    {
+        var chk_edit=confirm("是否要編輯?");
+        var aid=id;
+        var action="edit";
+        if(chk_edit)
+        {
+
+        $.ajax({
+            url:'modify-form1w-ajax.php',
+            data:
+            {
+                editor:action,
+                aid:aid,
+                },
+            dataType:'text',
+            type:"POST",
+
+            success: function(message)
+            {
+                // console.log(message);
+              
+                document.getElementById("message").innerHTML=message;
+                $('#add').remove();
+            },
+            error:   function(jqXHR, textStatus, errorThrown)
+            { 
+                // document.getElementById("message").innerHTML=errorThrown; 
+            }
+            
+        });
+
+    }
+
+        
+    }
+    function del(id)
+    {
+        var chk_del=confirm("確定要刪除嗎?");
+        var aid=id;
+
+        if(chk_del)
+        {
+            $.ajax({
+            url:'modify-form1w-d-ajax.php',
+            data:
+            {
+
+                aid:aid,
+                },
+            dataType:'text',
+            type:"POST",
+
+            success: function(message)
+            {
+                console.log(message);
+                // document.getElementById("message").innerHTML=message;
+            },
+            error:   function(jqXHR, textStatus, errorThrown)
+            { 
+                // document.getElementById("message").innerHTML=errorThrown; 
+            }
+            
+        });
+        }
+     
+
+
+    }
+
+    function chkedit()
+    {
+        var form=$("#form_editor").submit();
+        var chk=confirm('確定要修改?');
+        if(chk)
+        {
+            $.ajax({
+                url:'modify-form1w-e-ajax.php',
+                data:{
+                    form:form.serialize(),
+                    data:2,
+
+                },
+                type:"POST",
+
+                success: function(message)
+                {
+                    // alert(message);
+                    // console.log(message);
+                    // document.getElementById("message").innerHTML=message;
+                },
+                error:   function(jqXHR, textStatus, errorThrown)
+                { 
+                // document.getElementById("message").innerHTML=errorThrown; 
+                }
+            });
+
+
+        }
+        else
+        {
+
+            alert('2');
+        }
+
+
+    }
+
+</script>
