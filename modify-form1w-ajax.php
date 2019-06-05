@@ -1,9 +1,9 @@
 <?php
 header("Content-Type: text/html; charset=utf-8");
-$myhost     = "172.16.44.8";
+$myhost     = $myhost;
 $myuser     = "root";
-$mypassword = "seat";
-$mydatabase = "tra_y2019";
+$mypassword = "$mypass";
+$mydatabase = "$mypass";
 
 try{
     $pdo=new PDO(
